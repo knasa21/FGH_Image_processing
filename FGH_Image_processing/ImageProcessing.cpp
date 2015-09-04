@@ -27,17 +27,16 @@ double ImageProcessing::colorCheck(std::string input_filepath, int color_B, int 
 	int roi[4]; //x,y,w,h
 	cv::Mat roi_img;
 	cv::Mat src_img = cv::imread(input_filepath, 1);
+	if (src_img.empty()) {
+		std::cout << "file not found" << std::endl;
+		return -1;
+	}
 	//cv::Mat src_img(cv::Size(200,200), CV_8UC3, cv::Scalar(0,0,0));
 	cv::Mat color_img;
 	cv::Mat answer_img(cv::Size(200, 200), CV_8UC3, cv::Scalar(color_B, color_G, color_R));
 	std::vector<cv::Mat> planes;
 	int color_avg[3]; //B,G,R
 
-
-	if (src_img.empty()) {
-		std::cout << "file not found" << std::endl;
-		return 0;
-	}
 
 	//画像の中心部分を切り抜き
 	row = src_img.rows;
@@ -88,6 +87,35 @@ double ImageProcessing::colorCheck(std::string input_filepath, int color_B, int 
 	score = (score/441.673 -1.0) * -100;
 	//0の時表示がおかしくなるためそれを防ぐ（-9.97796e-008）
 	if (score < 0.001 && score > -0.001)score = 0.0;
+
+	return score;
+}
+
+double ImageProcessing::imageMatching(std::string input_filepath, std::string answer_filepath){
+	double score;
+	cv::Mat input_img = cv::imread(input_filepath,1);
+	if (input_img.empty()) {
+		std::cout << "file not found" << std::endl;
+		return -1;
+	}
+	cv::Mat gray_input,gray_answer;
+	cv::cvtColor(input_img,gray_input, CV_BGR2GRAY);
+	cv::normalize(gray_input, gray_input, 0, 255, cv::NORM_MINMAX);
+
+	std::vector<cv::KeyPoint> keypoint;
+	std::vector<cv::KeyPoint>::iterator itk;
+
+	//ORB検出器に基づく特徴点抽出
+	cv::Ptr<cv::ORB> detector = cv::ORB::create();
+	detector->detect(gray_input, keypoint);
+	//detector->compute(gray_input, keypoint,)
+	cv::Scalar color(200, 250, 255);
+	for (itk = keypoint.begin(); itk != keypoint.end(); ++itk){
+		cv::circle(input_img, itk->pt, 1, color, -1);
+		cv::circle(input_img, itk->pt, itk->size, color, 1, CV_AA);
+	}
+	
+	cv::imshow("ORB", input_img);
 
 	return score;
 }
