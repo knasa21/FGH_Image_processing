@@ -6,18 +6,18 @@ int main(){
 	int R, G, B;
 	std::string filename;
 
-	std::cin >> filename;
+	/*std::cin >> filename;
 	std::cin >> R;
 	std::cin >> G;
-	std::cin >> B;
+	std::cin >> B;*/
 	
 
 	//IP.showImage("../image/lenna.png");
 	//std::cout << "score " << IP.colorCheckRGB("../image/lenna.png", 100, 100, 255) << std::endl;
 	//std::cout << "score " << IP.colorCheckHSV("../image/lenna.png", 100, 100, 255) << std::endl;
 	
-	std::cout << IP.colorCheckHSV(filename, R, G, B) << std::endl;
-	//IP.imageMatching("../image/lenna_rotated.png", "../image/lenna.png");
+	//std::cout << IP.colorCheckHSV(filename, R, G, B) << std::endl;
+	IP.imageMatching("../image/hokousya.png", "../image/hyousikis.png");
 	cv::waitKey(0);
 	
 	

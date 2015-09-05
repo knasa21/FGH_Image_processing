@@ -191,18 +191,21 @@ double ImageProcessing::imageMatching(std::string input_filepath, std::string an
 
 	cv::Mat input_img = cv::imread(input_filepath);
 	cv::Mat answer_img = cv::imread(answer_filepath);
-
+	
 	//ORB
-	cv::Ptr<cv::ORB> detector = cv::ORB::create();
-	cv::Ptr<cv::DescriptorExtractor> extactor = cv::ORB::create();
+	cv::Ptr<cv::FeatureDetector> detector_in = cv::ORB::create(80, 1.25f, 4, 7, 0, 2, 0, 31);
+	cv::Ptr<cv::FeatureDetector> detector_an = cv::ORB::create(80, 1.25f, 4, 7, 0, 2, 0, 31);
+	//cv::Ptr<cv::FeatureDetector> detector_in = cv::AKAZE::create();
+	//cv::Ptr<cv::FeatureDetector> detector_an = cv::AKAZE::create();
 
 	//特徴量抽出
 	cv::Mat descriptors_in, descriptors_an;
-	std::vector<cv::KeyPoint> keypoints_in;
-	std::vector<cv::KeyPoint>  keypoints_an;
-	detector->detect(input_img, keypoints_in);
-	detector->detect(answer_img, keypoints_an);
+	std::vector<cv::KeyPoint> keypoints_in, keypoints_an;
+	detector_in->detect(input_img, keypoints_in);
+	detector_an->detect(answer_img, keypoints_an);
 
+	cv::Ptr<cv::DescriptorExtractor> extactor = cv::ORB::create(80, 1.25f, 4, 7, 0, 2, 0, 31);
+	//cv::Ptr<cv::DescriptorExtractor> extactor = cv::AKAZE::create();
 	extactor->compute(input_img, keypoints_in, descriptors_in);
 	extactor->compute(input_img, keypoints_an, descriptors_an);
 
@@ -211,6 +214,7 @@ double ImageProcessing::imageMatching(std::string input_filepath, std::string an
 	cv::BFMatcher macher(cv::NORM_HAMMING, true);
 	macher.match(descriptors_in, descriptors_an, matches);
 
+	
 	//最小距離
 	double min_dist = DBL_MAX;
 	for (int i = 0; i < (int)matches.size(); i++){
@@ -221,16 +225,18 @@ double ImageProcessing::imageMatching(std::string input_filepath, std::string an
 
 	//良いペアのみ残す
 	const double threshold = 3.0 * min_dist;
+	//const double threshold = 25.0;
 	std::vector<cv::DMatch> matches_good;
 	for (int i = 0; i < (int)matches.size(); i++){
 		if (matches[i].distance < threshold){
 			matches_good.push_back(matches[i]);
 		}
 	}
-
+	
 	//表示
 	cv::Mat matchImage;
-	cv::drawMatches(input_img, keypoints_in, answer_img, keypoints_an, matches_good, matchImage, cv::Scalar::all(-1), cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+	cv::drawMatches(input_img, keypoints_in, answer_img, keypoints_an, matches_good, matchImage, cv::Scalar::all(-1), cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::DEFAULT);
+	//cv::drawMatches(input_img, keypoints_in, answer_img, keypoints_an, matches, matchImage);
 	cv::imshow("match", matchImage);
 	cv::waitKey(0);
 
