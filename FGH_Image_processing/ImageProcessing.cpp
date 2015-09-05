@@ -269,4 +269,48 @@ double ImageProcessing::imageMatching(std::string input_filepath, std::string an
 	*/
 	return score;
 }
+
+
+int ImageProcessing::countPeopleFaces(std::string input_filepath){
+	int score;
+	cv::Mat input_img = cv::imread(input_filepath);
+	if (input_img.empty()) {
+		std::cout << "file not found" << std::endl;
+		return -1;
+	}
+	
+	double scale = 1.0;
+	cv::Mat gray, smallImg(cv::saturate_cast<int>(input_img.rows / scale), cv::saturate_cast<int>(input_img.cols / scale), CV_8UC1);
+	cv::cvtColor(input_img, gray, CV_BGR2GRAY);
+	cv::resize(gray, smallImg, smallImg.size(), 0, 0, cv::INTER_LINEAR);
+	cv::equalizeHist(smallImg, smallImg);
+
+	std::string cascadeName = "../cascade/haarcascade_frontalface_default.xml";
+	cv::CascadeClassifier face_cascade;
+	if (!face_cascade.load(cascadeName)){
+		std::cout << " Can't load cascade!" << std::endl;
+		return -1;
+	}
+
+	std::vector<cv::Rect> faces;
+
+	face_cascade.detectMultiScale(smallImg, faces, 1.1, 2,
+		CV_HAAR_SCALE_IMAGE,
+		cv::Size(10, 10));
+
+	std::vector<cv::Rect>::const_iterator r = faces.begin();
+	for (; r != faces.end(); ++r){
+		cv::Point center;
+		int radious;
+		center.x = cv::saturate_cast<int>((r->x + r->width*0.5)*scale);
+		center.y = cv::saturate_cast<int>((r->y + r->height*0.5)*scale);
+		radious = cv::saturate_cast<int>((r->width + r->height)*0.25*scale);
+		cv::circle(input_img, center, radious, cv::Scalar(80, 80, 255), 3, 8, 0);
+	}
+	
+	score = faces.size();
+
+	cv::imshow("result", input_img);
+	return score;
+}
  

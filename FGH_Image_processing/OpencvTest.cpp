@@ -17,7 +17,8 @@ int main(){
 	//std::cout << "score " << IP.colorCheckHSV("../image/lenna.png", 100, 100, 255) << std::endl;
 	
 	//std::cout << IP.colorCheckHSV(filename, R, G, B) << std::endl;
-	IP.imageMatching("../image/hokousya.png", "../image/hyousikis.png");
+	//IP.imageMatching("../image/hokousya.png", "../image/hyousikis.png");
+	std::cout << "score " <<IP.countPeopleFaces("../image/chukan_17.jpg") << std::endl;
 	cv::waitKey(0);
 	
 	

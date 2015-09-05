@@ -3,6 +3,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/features2d/features2d.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
 #include <iostream>
 class ImageProcessing
 {
@@ -17,5 +18,7 @@ public:
 	double colorCheckHSV(std::string input_filepath, int color_R, int color_G, int color_B);
 	//特徴点によるマッチング(ORB)
 	double imageMatching(std::string input_filepath, std::string answer_filepath);
+	//人の顔の数を数える
+	int countPeopleFaces(std::string input_filepath);
 };
 
