@@ -60,7 +60,6 @@ double ImageProcessing::colorCheckRGB(std::string input_filepath, int color_R, i
 	}
 	std::cout << "rows=" << src_img.rows << "cols" << src_img.cols << std::endl;
 	roi_img = cv::Mat(src_img, cv::Rect(roi[0],roi[1],roi[2],roi[3]));
-	cv::imshow("roi_img", roi_img);
 
 	//色の平均値を取得
 	cv::split(roi_img, planes);
@@ -85,6 +84,8 @@ double ImageProcessing::colorCheckRGB(std::string input_filepath, int color_R, i
 	//0の時表示がおかしくなるためそれを防ぐ（-9.97796e-008）
 	if (score < 0.001 && score > -0.001)score = 0.0;
 
+
+	cv::imshow("roi_img", roi_img);
 	cv::imshow("平均色", color_img);
 	cv::imshow("答え色", answer_img);
 
@@ -130,17 +131,13 @@ double ImageProcessing::colorCheckHSV(std::string input_filepath, int color_R, i
 		roi[1] = 0;
 		roi[3] = row;
 	}
-	std::cout << "rows=" << src_img.rows << "cols" << src_img.cols << std::endl;
+	//std::cout << "rows=" << src_img.rows << "cols" << src_img.cols << std::endl;
 	roi_img_BGR = cv::Mat(src_img, cv::Rect(roi[0], roi[1], roi[2], roi[3]));
-	imshow("BGRroi", roi_img_BGR);
 
 	cv::cvtColor(roi_img_BGR, roi_img_HSV, CV_BGR2HSV);
-	cv::imshow("HSVroi", roi_img_HSV);
-	cv::imshow("ansBGR", answer_img_BGR);
 	
 
 	cv::cvtColor(answer_img_BGR, answer_img_HSV, CV_RGB2HSV);
-	cv::imshow("ansHSV", answer_img_HSV);
 	//色の平均値を取得
 	cv::split(roi_img_HSV, input_planes);
 	cv::split(answer_img_HSV, answer_planes);
@@ -150,14 +147,13 @@ double ImageProcessing::colorCheckHSV(std::string input_filepath, int color_R, i
 		cv::reduce(m2, m3, 1, CV_REDUCE_AVG);
 		color_avg[i] = m3.at<uchar>(0, 0);
 		answer_color[i] = answer_planes[i].at<uchar>(0, 0);
-		std::cout << "avg " << color_avg[i] << std::endl;
-		std::cout << "ans " << answer_color[i] << std::endl;
+		//std::cout << "avg " << color_avg[i] << std::endl;
+		//std::cout << "ans " << answer_color[i] << std::endl;
 	}
 	//平均色画像作成
 	color_img = cv::Mat(cv::Size(200, 200), CV_8UC3, cv::Scalar(color_avg[0], color_avg[1], color_avg[2]));
 	//cv::cvtColor(color_img, color_img, CV_HSV2BGR);
 
-	cv::imshow("平均色", color_img);
 
 	//答えとどれだけ離れているか
 
@@ -178,7 +174,15 @@ double ImageProcessing::colorCheckHSV(std::string input_filepath, int color_R, i
 	score = (score / 371.685 - 1.0) * -100;
 	//0の時表示がおかしくなるためそれを防ぐ（-9.97796e-008）
 	if (score < 0.001 && score > -0.001)score = 0.0;
+	//最高点がつかないので99より高いとで100点に
+	if (score > 99 && score <= 100)score = 100;
 
+/*	cv::imshow("BGRroi", roi_img_BGR);
+	cv::imshow("HSVroi", roi_img_HSV);
+	cv::imshow("平均色", color_img);
+	cv::imshow("ansHSV", answer_img_HSV);
+	cv::imshow("ansBGR", answer_img_BGR);
+*/
 	return score;
 }
 
