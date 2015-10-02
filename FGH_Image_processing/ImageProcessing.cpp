@@ -285,7 +285,7 @@ int ImageProcessing::countPeopleFaces(std::string input_filepath){
 	cv::resize(gray, smallImg, smallImg.size(), 0, 0, cv::INTER_LINEAR);
 	cv::equalizeHist(smallImg, smallImg);
 
-	std::string cascadeName = "../cascade/haarcascade_frontalface_default.xml";
+	std::string cascadeName = "haarcascade_frontalface_default.xml";
 	cv::CascadeClassifier face_cascade;
 	if (!face_cascade.load(cascadeName)){
 		std::cout << " Can't load cascade!" << std::endl;
@@ -293,10 +293,7 @@ int ImageProcessing::countPeopleFaces(std::string input_filepath){
 	}
 
 	std::vector<cv::Rect> faces;
-
-	face_cascade.detectMultiScale(smallImg, faces, 1.1, 2,
-		CV_HAAR_SCALE_IMAGE,
-		cv::Size(10, 10));
+	face_cascade.detectMultiScale(smallImg, faces, 1.1, 2,CV_HAAR_SCALE_IMAGE,cv::Size(10, 10));
 
 	std::vector<cv::Rect>::const_iterator r = faces.begin();
 	for (; r != faces.end(); ++r){
@@ -305,9 +302,9 @@ int ImageProcessing::countPeopleFaces(std::string input_filepath){
 		center.x = cv::saturate_cast<int>((r->x + r->width*0.5)*scale);
 		center.y = cv::saturate_cast<int>((r->y + r->height*0.5)*scale);
 		radious = cv::saturate_cast<int>((r->width + r->height)*0.25*scale);
-		cv::circle(input_img, center, radious, cv::Scalar(80, 80, 255), 3, 8, 0);
+		cv::circle(input_img, center, radious, cv::Scalar(80, 80, 255), 2, 5, 0);
 	}
-	
+
 	score = faces.size();
 
 	cv::imshow("result", input_img);
